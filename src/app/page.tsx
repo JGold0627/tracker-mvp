@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 
+type Project = { name: string };
+
 export default function Home() {
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [name, setName] = useState("");
 
   const addProject = () => {
-    if (!name) return;
-    setProjects([...projects, { name }]);
+    if (!name.trim()) return;
+    setProjects((prev) => [...prev, { name: name.trim() }]);
     setName("");
   };
 
