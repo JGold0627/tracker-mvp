@@ -1,16 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-type Project = { name: string };
+type Project = { id: string; name: string };
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [name, setName] = useState("");
 
-  const addProject = () => {
+  // load projects from database
+  useEffect(() => {
+    fetch("/api/projects")
+      .then((res) => res.json())
+      .then(setProjects);
+  }, []);
+
+  const addProject = async () => {
     if (!name.trim()) return;
-    setProjects((prev) => [...prev, { name: name.trim() }]);
+
+    const res = await fetch("/api/projects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+
+    const newProject = await res.json();
+    setProjects((p) => [...p, newProject]);
     setName("");
   };
 
@@ -31,8 +46,8 @@ export default function Home() {
       </div>
 
       <ul>
-        {projects.map((p, i) => (
-          <li key={i}>{p.name}</li>
+        {projects.map((p) => (
+          <li key={p.id}>{p.name}</li>
         ))}
       </ul>
     </main>
